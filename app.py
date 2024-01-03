@@ -12,7 +12,8 @@ GITHUB_ACCESS_TOKEN = "github_pat_11BDP5NTY0RJqQ5zaf9uQT_9SDyJsVg9hr0XACQGIeO8MY
 def initialize_user_data():
     try:
         # Download user_data.xlsx from GitHub
-        url = f'https://raw.githubusercontent.com/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/main/user_data.xlsx'
+        #url = f'https://raw.githubusercontent.com/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/main/user_data.xlsx'
+        url=f'https://github.com/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/blob/main/user_data.xlsx
         response = requests.get(url)
         response.raise_for_status()
         user_data = pd.read_excel(BytesIO(response.content))
