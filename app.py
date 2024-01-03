@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import requests
 from io import BytesIO
-
+import base64
 # GitHub repository information
 GITHUB_REPO_OWNER = "deepakskepit"
 GITHUB_REPO_NAME = "test_automate "
