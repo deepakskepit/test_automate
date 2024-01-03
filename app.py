@@ -2,65 +2,52 @@ import streamlit as st
 import pandas as pd
 import requests
 from io import BytesIO
-import base64
-import configparser
 
-config = configparser.RawConfigParser()
-config.read('config.ini')
-
-GITHUB_REPO_OWNER = config.get('github', 'GITHUB_REPO_OWNER')
-GITHUB_REPO_NAME = config.get('github', 'GITHUB_REPO_NAME')
-GITHUB_ACCESS_TOKEN = config.get('github', 'GITHUB_ACCESS_TOKEN')
-
-def get_github_headers():
-    return {
-        'Authorization': f'Bearer {GITHUB_ACCESS_TOKEN}',
-        'Content-Type': 'application/json',
-    }
-
-
+# GitHub repository information
+GITHUB_REPO_OWNER = "your-username"
+GITHUB_REPO_NAME = "your-repo-name"
+GITHUB_ACCESS_TOKEN = "your-access-token"  # Make sure to keep this secure
 
 # Function to create or load the user data Excel file
 def initialize_user_data():
     try:
         # Download user_data.xlsx from GitHub
         url = f'https://raw.githubusercontent.com/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/main/user_data.xlsx'
-        response = requests.get(url, headers=get_github_headers())
+        response = requests.get(url)
         response.raise_for_status()
         user_data = pd.read_excel(BytesIO(response.content))
     except (requests.RequestException, pd.errors.EmptyDataError):
         columns = ['Username', 'Password', 'PageID', 'AccessToken']
         user_data = pd.DataFrame(columns=columns)
         upload_user_data(user_data)
-    return user_data.copy()
+    return user_data
 
 # Function to upload user data to GitHub
 def upload_user_data(user_data):
     user_data.to_excel("user_data.xlsx", index=False)
     with open("user_data.xlsx", "rb") as file:
-        content = base64.b64encode(file.read()).decode('utf-8')
+        content = file.read()
     
     url = f'https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/user_data.xlsx'
-    headers = get_github_headers()
+    headers = {
+        'Authorization': f'Bearer {GITHUB_ACCESS_TOKEN}',
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    }
     data = {
         'message': 'Update user_data.xlsx',
-        'content': content
+        'content': content.decode('base64')
     }
     response = requests.put(url, headers=headers, json=data)
     response.raise_for_status()
+
 # Function to handle login for new user
 def new_user_login(username, password, pageid, access_token):
-    existing_user_data = initialize_user_data()
-    
-    if not isinstance(existing_user_data, pd.DataFrame):
-        existing_user_data = pd.DataFrame(columns=['Username', 'Password', 'PageID', 'AccessToken'])
-    
+    user_data = initialize_user_data()
     new_entry = pd.DataFrame([[username, password, pageid, access_token]],
                              columns=['Username', 'Password', 'PageID', 'AccessToken'])
-    updated_user_data = pd.concat([existing_user_data, new_entry], ignore_index=True)
-    
-    upload_user_data(updated_user_data)
-    return updated_user_data
+    user_data = user_data.append(new_entry, ignore_index=True)
+    upload_user_data(user_data)
+    return user_data
 
 # Function to handle login for existing user
 def existing_user_login(username):
