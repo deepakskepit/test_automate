@@ -3,10 +3,14 @@ import pandas as pd
 import requests
 from io import BytesIO
 import base64
-# GitHub repository information
-GITHUB_REPO_OWNER = "deepakskepit"
-GITHUB_REPO_NAME = "test_automate"
-GITHUB_ACCESS_TOKEN = "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"  # Make sure to keep this secure
+import configparser
+
+config = configparser.RawConfigParser()
+config.read('config.ini')
+
+GITHUB_REPO_OWNER = config.get('github', 'GITHUB_REPO_OWNER')
+GITHUB_REPO_NAME = config.get('github', 'GITHUB_REPO_NAME')
+GITHUB_ACCESS_TOKEN = config.get('github', 'GITHUB_ACCESS_TOKEN')
 
 # Function to create or load the user data Excel file
 def initialize_user_data():
@@ -20,7 +24,7 @@ def initialize_user_data():
         columns = ['Username', 'Password', 'PageID', 'AccessToken']
         user_data = pd.DataFrame(columns=columns)
         upload_user_data(user_data)
-    return user_data
+    return user_data.copy()
 
 # Function to upload user data to GitHub
 def upload_user_data(user_data):
