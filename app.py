@@ -42,9 +42,15 @@ def upload_user_data(user_data):
 # Function to handle login for new user
 def new_user_login(username, password, pageid, access_token):
     existing_user_data = initialize_user_data()
+    
+    print(f"Type of existing_user_data: {type(existing_user_data)}")
+    
     new_entry = pd.DataFrame([[username, password, pageid, access_token]],
                              columns=['Username', 'Password', 'PageID', 'AccessToken'])
     updated_user_data = existing_user_data.append(new_entry, ignore_index=True)
+    
+    print(f"Type of updated_user_data: {type(updated_user_data)}")
+    
     upload_user_data(updated_user_data)
     return updated_user_data
 
