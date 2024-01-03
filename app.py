@@ -12,12 +12,20 @@ GITHUB_REPO_OWNER = config.get('github', 'GITHUB_REPO_OWNER')
 GITHUB_REPO_NAME = config.get('github', 'GITHUB_REPO_NAME')
 GITHUB_ACCESS_TOKEN = config.get('github', 'GITHUB_ACCESS_TOKEN')
 
+def get_github_headers():
+    return {
+        'Authorization': f'Bearer {GITHUB_ACCESS_TOKEN}',
+        'Content-Type': 'application/json',
+    }
+
+
+
 # Function to create or load the user data Excel file
 def initialize_user_data():
     try:
         # Download user_data.xlsx from GitHub
         url = f'https://raw.githubusercontent.com/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/main/user_data.xlsx'
-        response = requests.get(url)
+        response = requests.get(url, headers=get_github_headers())
         response.raise_for_status()
         user_data = pd.read_excel(BytesIO(response.content))
     except (requests.RequestException, pd.errors.EmptyDataError):
@@ -33,10 +41,7 @@ def upload_user_data(user_data):
         content = base64.b64encode(file.read()).decode('utf-8')
     
     url = f'https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/user_data.xlsx'
-    headers = {
-        'Authorization': f'Bearer {GITHUB_ACCESS_TOKEN}',
-        'Content-Type': 'application/json',
-    }
+    headers = get_github_headers()
     data = {
         'message': 'Update user_data.xlsx',
         'content': content
