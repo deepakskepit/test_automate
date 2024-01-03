@@ -4,9 +4,9 @@ import requests
 from io import BytesIO
 
 # GitHub repository information
-GITHUB_REPO_OWNER = "your-username"
-GITHUB_REPO_NAME = "your-repo-name"
-GITHUB_ACCESS_TOKEN = "your-access-token"  # Make sure to keep this secure
+GITHUB_REPO_OWNER = "deepakskepit"
+GITHUB_REPO_NAME = "test_automate "
+GITHUB_ACCESS_TOKEN = "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"  # Make sure to keep this secure
 
 # Function to create or load the user data Excel file
 def initialize_user_data():
