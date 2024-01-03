@@ -26,16 +26,16 @@ def initialize_user_data():
 def upload_user_data(user_data):
     user_data.to_excel("user_data.xlsx", index=False)
     with open("user_data.xlsx", "rb") as file:
-        content = file.read()
+        content = base64.b64encode(file.read()).decode('utf-8')
     
     url = f'https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/user_data.xlsx'
     headers = {
         'Authorization': f'Bearer {GITHUB_ACCESS_TOKEN}',
-        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Type': 'application/json',
     }
     data = {
         'message': 'Update user_data.xlsx',
-        'content': content.decode('base64')
+        'content': content
     }
     response = requests.put(url, headers=headers, json=data)
     response.raise_for_status()
