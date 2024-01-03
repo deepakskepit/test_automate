@@ -41,12 +41,12 @@ def upload_user_data(user_data):
     response.raise_for_status()
 # Function to handle login for new user
 def new_user_login(username, password, pageid, access_token):
-    user_data = initialize_user_data()
+    existing_user_data = initialize_user_data()
     new_entry = pd.DataFrame([[username, password, pageid, access_token]],
                              columns=['Username', 'Password', 'PageID', 'AccessToken'])
-    user_data = user_data.append(new_entry, ignore_index=True)
-    upload_user_data(user_data)
-    return user_data
+    updated_user_data = existing_user_data.append(new_entry, ignore_index=True)
+    upload_user_data(updated_user_data)
+    return updated_user_data
 
 # Function to handle login for existing user
 def existing_user_login(username):
